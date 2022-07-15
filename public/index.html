@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Security-Policy" content="script-src * data: self 'unsafe-inline' 'unsafe-eval';">
+    <meta charset="UTF-8">
+    <script src="/vue.js"></script>
+    <script src="/axios.js"></script>
+    <link href="/tailwind.css" rel="stylesheet">
+    <title>To beloved girlfriend</title>
+</head>
+
+<body class="bg-indigo-600">
+    <div id="app">
+        <div class="py-12 bg-white max-w-4xl mx-auto rounded-md mt-8 sm:max-w-4/5">
+
+
+
+            <div class="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" v-if="!authenticated">
+                <div class="max-w-md w-full space-y-8 sm:max-w-lg lg:max-w-md">
+                    <div>
+                        <h2 class="mt-6 text-center font-extrabold text-gray-900  sm:text-5xl lg:text-3xl">Войдите в
+                            аккаунт</h2>
+                    </div>
+                    <form @submit.prevent="login()" class="mt-8 space-y-6" action="#" method="POST">
+                        <input type="hidden" name="remember" value="true">
+                        <div class="rounded-md shadow-sm -space-y-px">
+                            <div>
+                                <label for="Login" class="sr-only">Login</label>
+                                <input id="Login" v-model="loginUsername" name="Login" type="text" autocomplete="Login"
+                                    required
+                                    class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-2xl lg:text-sm"
+                                    placeholder="Логин">
+                            </div>
+                            <div>
+                                <label for="password" class="sr-only">Password</label>
+                                <input id="password" v-model="loginPassword" name="password" type="password"
+                                    autocomplete="current-password" required
+                                    class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-2xl lg:text-sm"
+                                    placeholder="Пароль">
+                            </div>
+                        </div>
+                        <div>
+                            <button type="submit"
+                                class="group relative w-full flex justify-center py-2 px-4 border border-transparent font-medium rounded-md text-white bg-indigo-500 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-2xl lg:text-sm">
+                                <!-- <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+                          <svg class="h-5 w-5 text-indigo-400 group-hover:text-indigo-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                          </svg>
+                        </span> -->
+                                Войти
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div v-else>
+                <div class="text-center">
+                    <h1 class="mt-2 text-3xl font-extrabold text-gray-900">Сайт для самой лучшей
+                        парочки</h1>
+                    <div class="flex justify-center mt-8 text-indigo-500 font-semibold sm:text-2xl lg:text-lg">
+                        <div @click="zero"
+                            class="rounded bg-indigo-500 hover:bg-indigo-700 py-1 px-3 mr-20 cursor-pointer text-white lg:text-md">
+                            0
+                        </div>
+                        Дней без ссор: {{ count }}
+                        <div @click="increment"
+                            class="rounded bg-indigo-500 hover:bg-indigo-700 py-1 px-3 ml-20 cursor-pointer text-white">
+                            +1
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-column justify-center mx-auto sm:max-w-xl lg:max-w-lg">
+                    <div>
+                        <div class="mt-2 tracking-tight text-gray-900 text-center py-3 sm:text-4xl lg:text-xl">Мой
+                            списочек🥰</div>
+                        <form @submit.prevent="addToMy"
+                            class="bg-indigo-500 z-0 rounded-full py-1 px-1 shadow-md sm:text-2xl lg:text-xl">
+                            <input v-model="myParagaph"
+                                class="bg-white appearance-none border-2 border-gray-200 rounded-full py-2 px-4 leading-tight focus:outline-none z-10 w-3/4">
+                            <button class="px-3 text-white">Добавить</button>
+                        </form>
+                        <ul class="px-2 py-2 mt-3 shadow-md rounded" v-if="myList.length > 0">
+                            <li v-for="paragaph in myList" :key="paragaph.id"
+                                class="flex justify-between mt-2 px-2 py-1 sm:text-2xl lg:text-xl">
+                                {{ paragaph.text }}
+                                <button @click="removeFromMy(paragaph)">X</button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div>
+                        <div class="mt-2 tracking-tight text-gray-900 text-center py-3 sm:text-4xl lg:text-xl">
+                            Списочек Насти🥰</div>
+                        <form @submit.prevent="addToHer"
+                            class="bg-indigo-500 z-0 rounded-full py-1 px-1 shadow-md sm:text-2xl lg:text-xl">
+                            <input v-model="herParagaph"
+                                class="bg-white appearance-none border-2 border-gray-200 rounded-full py-2 px-4 leading-tight focus:outline-none z-10 w-3/4">
+                            <button class="px-3 text-white">Добавить</button>
+                        </form>
+                        <ul class="px-2 py-2 mt-3 shadow-md rounded" v-if="herList.length > 0">
+                            <li v-for="paragaph in herList" :key="paragaph.id"
+                                class="flex justify-between px-2 py-1 sm:text-2xl lg:text-xl">
+                                {{ paragaph.text }}
+                                <button @click="removeFromHer(paragaph)">X</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script defer>
+        const { createApp } = Vue
+        let id = 0
+        createApp({
+            data() {
+                return {
+                    authenticated: false,
+                    count: 0,
+                    myParagaph: '',
+                    herParagaph: '',
+                    myList: [],
+                    herList: [],
+                    user: null,
+                    loginUsername: "",
+                    loginPassword: "",
+                }
+            },
+            methods: {
+                increment() {
+                    this.count++
+                    axios.post("/api/chengeCounter", { data: this.count }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => { console.log(err); })
+                },
+                zero() {
+                    this.count = 0
+                    axios.post("/api/chengeCounter", { data: this.count }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => { console.log(err); })
+                },
+                addToMy() {
+                    newParagraph = { id: id++, text: this.myParagaph }
+                    this.myList.push(newParagraph)
+                    axios.post("/api/addToMy", { data: newParagraph }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => { console.log(err); })
+                    this.myParagaph = ''
+                },
+                removeFromMy(paragaph) {
+                    this.myList = this.myList.filter((t) => t !== paragaph)
+                    axios.post("/api/removeFromMy", { data: paragaph.text }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => { console.log(err); })
+                },
+                addToHer() {
+                    newParagraph = { id: id++, text: this.herParagaph }
+                    this.herList.push(newParagraph)
+                    axios.post("/api/addToHer", { data: newParagraph }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => { console.log(err); })
+                    this.herParagaph = ''
+                },
+                removeFromHer(paragaph) {
+                    this.herList = this.herList.filter((t) => t !== paragaph)
+                    axios.post("/api/removeFromHer", { data: paragaph.text }).then(res => {
+                        console.log(res.data);
+                    }).catch(err => { console.log(err); })
+                },
+                async login() {
+                    try {
+                        let res = await axios.post("/api/login", { login: this.loginUsername, password: this.loginPassword })
+                        console.log(res.data);
+                        if (res.data.status == true) {
+                            localStorage.setItem("token", res.data.token)
+                            this.verify()
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                },
+                async verify() {
+                    try {
+                        console.log("verifyin");
+                        if (localStorage.getItem("token")) {
+                            let r = await axios.post("/api/verify", { token: localStorage.getItem("token") })
+                            if (r.data.status == true) { this.user = r.data.user; this.authenticated = true }
+                        }
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+
+            },
+            async mounted() {
+                try {
+                    let res = await axios.get("/api/list")
+                    this.myList = res.data.myData
+                    this.herList = res.data.herData
+                    this.count = res.data.countDays
+                    this.verify()
+                } catch (err) { console.log(err); }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
