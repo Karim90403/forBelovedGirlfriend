@@ -82,9 +82,9 @@
                             <button class="px-3 text-white">Добавить</button>
                         </form>
                         <ul class="px-2 py-2 mt-3 shadow-md rounded" v-if="myList.length > 0">
-                            <li v-for="paragaph in myList" :key="paragaph.id"
+                            <li v-for="(paragaph, index) in myList" :key="index"
                                 class="flex justify-between mt-2 px-2 py-1 sm:text-2xl lg:text-xl">
-                                {{ paragaph.text }}
+                                {{ paragaph }}
                                 <button @click="removeFromMy(paragaph)">X</button>
                             </li>
                         </ul>
@@ -99,9 +99,9 @@
                             <button class="px-3 text-white">Добавить</button>
                         </form>
                         <ul class="px-2 py-2 mt-3 shadow-md rounded" v-if="herList.length > 0">
-                            <li v-for="paragaph in herList" :key="paragaph.id"
+                            <li v-for="(paragaph, index) in herList" :key="index"
                                 class="flex justify-between px-2 py-1 sm:text-2xl lg:text-xl">
-                                {{ paragaph.text }}
+                                {{ paragaph }}
                                 <button @click="removeFromHer(paragaph)">X</button>
                             </li>
                         </ul>
@@ -130,45 +130,37 @@
                 }
             },
             methods: {
+                async updateData() {
+                    try {
+                        let r = await axios.post("/api/updateData", { myData: this.myList, herData: this.herList, countDays: this.count })
+                    } catch (e) { console.log(e); }
+                },
                 increment() {
                     this.count++
-                    axios.post("/api/chengeCounter", { data: this.count }).then(res => {
-                        console.log(res.data);
-                    }).catch(err => { console.log(err); })
+                    this.updateData()
                 },
                 zero() {
                     this.count = 0
-                    axios.post("/api/chengeCounter", { data: this.count }).then(res => {
-                        console.log(res.data);
-                    }).catch(err => { console.log(err); })
+                    this.updateData()
                 },
                 addToMy() {
-                    newParagraph = { id: id++, text: this.myParagaph }
-                    this.myList.push(newParagraph)
-                    axios.post("/api/addToMy", { data: newParagraph }).then(res => {
-                        console.log(res.data);
-                    }).catch(err => { console.log(err); })
+                    this.myList.push(this.myParagaph)
                     this.myParagaph = ''
+                    this.updateData()
                 },
                 removeFromMy(paragaph) {
                     this.myList = this.myList.filter((t) => t !== paragaph)
-                    axios.post("/api/removeFromMy", { data: paragaph.text }).then(res => {
-                        console.log(res.data);
-                    }).catch(err => { console.log(err); })
+                    this.updateData()
                 },
                 addToHer() {
-                    newParagraph = { id: id++, text: this.herParagaph }
-                    this.herList.push(newParagraph)
-                    axios.post("/api/addToHer", { data: newParagraph }).then(res => {
-                        console.log(res.data);
-                    }).catch(err => { console.log(err); })
+                    // newParagraph = { id: id++, text: this.herParagaph }
+                    this.herList.push(this.herParagaph)
                     this.herParagaph = ''
+                    this.updateData()
                 },
                 removeFromHer(paragaph) {
                     this.herList = this.herList.filter((t) => t !== paragaph)
-                    axios.post("/api/removeFromHer", { data: paragaph.text }).then(res => {
-                        console.log(res.data);
-                    }).catch(err => { console.log(err); })
+                    this.updateData()
                 },
                 async login() {
                     try {
